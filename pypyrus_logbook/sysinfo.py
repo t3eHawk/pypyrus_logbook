@@ -15,7 +15,7 @@ class Sysinfo():
     def __init__(self, log):
         self.log = log
         self.parser = argparse.ArgumentParser()
-        self.process(env=True, exe=True, args=True)
+        self.process(env=True, exe=True)
         pass
 
     def __str__(self):
@@ -28,26 +28,25 @@ class Sysinfo():
 
     __repr__ = __str__
 
-    def process(self, env=False, exe=False, args=False, stat=True):
+    def process(self, env=False, exe=False, args=True, anons=True, stat=True):
         if env is True:
             self.env = Data()
             for key, value in os.environ.items():
                 self.env[key.lower()] = value
 
 
-        if args is True or exe is True:
-            knowns, anons = self.parser.parse_known_args()
-            if args is True:
-                self.args = knowns
-            if exe is True:
-                self.exe = Data()
-                for item in anons:
-                    try:
-                        key, value = item.split('=')
-                    except ValueError:
-                        pass
-                    else:
-                        self.exe[key.lower()] = value
+        if exe is True or args is True or anons is True:
+            knowns, unknowns = self.parser.parse_known_args()
+            if args is True: self.args = knowns
+            if exe is True: self.exe = Data()
+            if anons is True: self.anons = []
+            for item in unknowns:
+                try:
+                    key, value = item.split('=')
+                except ValueError:
+                    if anons is True: self.anons.append(item)
+                else:
+                    if exe is True: self.exe[key.lower()] = value
 
         if stat is True:
             self.stat = Data()
