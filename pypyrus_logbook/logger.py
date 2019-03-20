@@ -3,6 +3,7 @@ import sys
 import time
 import platform
 import traceback
+import pypyrus_logbook as logbook
 
 from datetime import datetime
 
@@ -14,28 +15,40 @@ from .sysinfo import Sysinfo
 from .formatter import Formatter
 from .errors import StatusException
 
+py_path = os.path.abspath(sys.argv[0])
+py_folder = os.path.dirname(py_path)
+py_file, py_ext = os.path.splitext(os.path.basename(py_path))
 
-class Log():
+class Logger():
+    def __new__(cls, app=None, *args, **kwargs):
+        app = app or py_file
+        logger = logbook.catalog.get(app)
+        logger = logger or BaseLogger(app=app, *args, **kwargs)
+        return logger
+
+class BaseLogger():
     """Main API for using and managing the logs."""
     def __init__(
-        self, app, desc=None, version=None,
+        self, app=None, desc=None, version=None,
         status=True, file=True, console=False, control=True,
         folder=None, filename=None, extension=None,
         format=None, length=80, div='*', error_format=None,
         err_formatting=True, alarming=True, limit_by_size=True,
         max_size=1024*1024*10, limit_by_day=True, email=False, ip=None,
-        port=None, user=None, password=None, tls=True, recipients=None
+        port=None, user=None, password=None, tls=True, recipients=None,
+        info=True, debug=False, warning=True, error=True, critical=True
     ):
         # Attributes describing the application.
-        self.__app = app
-        self.__desc = desc
-        self.__version = version
+        self._app = app or py_file
+        self._desc = desc
+        self._version = version
 
-        # Some log important attributes
-        self.__control = control
-        self.__open_time = datetime.now()
+        # Some logger important attributes
+        self._control = control
+        self._open_time = datetime.now()
+        self._with_error = False
 
-        # Global log config.
+        # Global logger config.
         self.CONFIG = {}
 
         # Default messages.
@@ -55,7 +68,7 @@ class Log():
             'critical': 'CRITICAL'
         }
 
-        folder = folder or 'logs'
+        folder = folder or os.path.join(py_folder, 'logs')
         filename = filename or '{app}_{tmstmp:%Y%m%d%H%M%S}'
         extension = extension or 'log'
         format = format or '{isotime}\t{rectype}\t{message}\n'
@@ -70,33 +83,16 @@ class Log():
             limit_by_size=limit_by_size, max_size=max_size,
             limit_by_day=limit_by_day, email=email, ip=ip, port=port,
             user=user, password=password, tls=tls, recipients=recipients,
-            emergency=2)
+            emergency=2, info=info, debug=debug, warning=warning,
+            error=error, critical=critical)
+
+        logbook.catalog[self.app] = self
         pass
 
-    # Getters for private variables.
-    @property
-    def app(self):
-        return self.__app
+    def __str__(self):
+        return f'Logger <{self.app}>'
 
-    @property
-    def desc(self):
-        return self.__desc
-
-    @property
-    def version(self):
-        return self.__version
-
-    @property
-    def control(self):
-        return self.__control
-
-    @property
-    def open_time(self):
-        return self.__open_time
-
-    @property
-    def status(self):
-        return self.__status
+    __repr__ = __str__
 
     def configure(
         self, file=None, console=None, status=None,
@@ -104,13 +100,14 @@ class Log():
         format=None, error_format=None, err_formatting=None, alarming=None,
         length=None, div=None, limit_by_size=None, max_size=None,
         limit_by_day=None, email=None, ip=None, port=None, user=None,
-        password=None, tls=None, recipients=None, emergency=None
+        password=None, tls=None, recipients=None, emergency=None,
+        info=None, debug=None, warning=None, error=None, critical=None
     ):
         """
-        Main method to configure the log.
+        Main method to configure the logger.
         Entered parameters are recognizing automatically.
         Some of the parameters are not allowed to modify due to intersection
-        with important log variables. They will be skipped if detected.
+        with important logger variables. They will be skipped if detected.
         After recognized parameters has been updated only new remain.
         All new will be stored to forms.
         When all parameters are in place necessary updates will run.
@@ -196,6 +193,16 @@ class Log():
             config['limit_by_day'] = limit_by_day
         if emergency is not None:
             config['emergency'] = emergency
+        if info is not None:
+            config['info'] = info
+        if debug is not None:
+            config['debug'] = debug
+        if warning is not None:
+            config['warning'] = warning
+        if error is not None:
+            config['error'] = error
+        if critical is not None:
+            config['critical'] = critical
 
         pass
 
@@ -213,9 +220,10 @@ class Log():
         Local forms can be passed through the kwargs.
         They will have higher priority than forms from global config.
         """
-        record = Record(self, rectype, message, error=error, **kwargs)
-        string = record.create()
-        self.write(string)
+        if self.CONFIG.get(rectype, True) is True:
+            record = Record(self, rectype, message, error=error, **kwargs)
+            string = record.create()
+            self.write(string)
         pass
 
     def info(self, message, **kwargs):
@@ -240,6 +248,8 @@ class Log():
         Send alarm notification if email is configurated.
         Abort the application in case of high level error.
         """
+        self._with_error = True
+
         config = self.CONFIG
         messages = self.MESSAGES
         if formatting is None:
@@ -282,10 +292,8 @@ class Log():
                 self.email.alarm()
 
         # Break execution in case of critical error if permitted.
-        if self.__control is True:
+        if self._control is True:
             if level >= config['emergency']:
-                sos = sos or messages['sos']
-                self.record(rectype, sos, **kwargs)
                 sys.exit()
         pass
 
@@ -319,7 +327,7 @@ class Log():
     def bound(self, div=None, length=None):
         """
         Draw horizontal border.
-        Useful when need to separate different log blocks.
+        Useful when need to separate different logger blocks.
         """
         length = self.CONFIG['length']
         div = self.CONFIG['div']
@@ -356,7 +364,7 @@ class Log():
 
     def restart(self):
         """Open new output file to continue the logging."""
-        self.__open_time = datetime.now()
+        self._open_time = datetime.now()
         if self.output.file.used is True:
             self.output.file.close()
         if self.header.used is True:
@@ -381,3 +389,32 @@ class Log():
                     if self.output.file.modified.day != datetime.now().day:
                         self.restart()
                         return
+
+    # Getters for private variables.
+    @property
+    def app(self):
+        return self._app
+
+    @property
+    def desc(self):
+        return self._desc
+
+    @property
+    def version(self):
+        return self._version
+
+    @property
+    def control(self):
+        return self._control
+
+    @property
+    def open_time(self):
+        return self._open_time
+
+    @property
+    def status(self):
+        return self.__status
+
+    @property
+    def with_error(self):
+        return self._with_error

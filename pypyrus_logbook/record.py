@@ -8,13 +8,13 @@ from .formatter import Formatter
 class Record():
     """
     This class describes the record. Record is an instance that is going
-    to be logged as separated line or set of lines in the log.
+    to be logged as separated line or set of lines in the logger.
     """
     def __init__(
-        self, log, rectype, message, error=False,
+        self, logger, rectype, message, error=False,
         format=None, error_format=None, **kwargs
     ):
-        self.log = log
+        self.logger = logger
         frame = self.__catch_frame()
         f_code = frame.f_code
         flname = f_code.co_filename
@@ -25,17 +25,17 @@ class Record():
 
         self.flname = os.path.splitext(os.path.basename(flname))[0]
         self.objname = objname if objname != '<module>' else 'main'
-        self.rectype = log.RECTYPES[rectype]
+        self.rectype = logger.RECTYPES[rectype]
 
-        format = format or log.CONFIG['format']
+        format = format or logger.CONFIG['format']
         self.__rec_formatter = Formatter(format)
 
         self.message = message
         if error is True:
-            msg_fmt = message or log.CONFIG['error_format']
+            msg_fmt = message or logger.CONFIG['error_format']
         elif error is False:
             msg_fmt = message
-        self.__msg_formatter = Formatter(msg_fmt, log = log, **kwargs)
+        self.__msg_formatter = Formatter(msg_fmt, logger = logger, **kwargs)
         pass
 
     def __str__(self):

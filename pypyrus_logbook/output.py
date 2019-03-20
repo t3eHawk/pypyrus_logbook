@@ -21,10 +21,10 @@ class Output():
         collection used in file path formatter.
     """
     def __init__(
-        self, log, path=None, file=True, console=False, status=True, **kwargs
+        self, logger, path=None, file=True, console=False, status=True, **kwargs
     ):
-        self.log = log
-        app = log.app
+        self.logger = logger
+        app = logger.app
         tmstmp = datetime.now()
         self.file = File(path, used=file, app=app, tmstmp=tmstmp, **kwargs)
         self.console = Console(used=console)

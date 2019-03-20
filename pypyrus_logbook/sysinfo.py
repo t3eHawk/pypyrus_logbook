@@ -12,8 +12,8 @@ class Data(dict):
         return self.get(name)
 
 class Sysinfo():
-    def __init__(self, log):
-        self.log = log
+    def __init__(self, logger):
+        self.logger = logger
         self.parser = argparse.ArgumentParser()
         self.process(env=True, exe=True)
         pass
@@ -52,17 +52,19 @@ class Sysinfo():
             self.stat = Data()
             stat = {
                 'app':
-                    self.log.app,
+                    self.logger.app,
                 'desc':
-                    self.log.desc,
+                    self.logger.desc,
                 'version':
-                    self.log.version,
+                    self.logger.version,
                 'hostname':
                     platform.node(),
                 'ip':
                     socket.gethostbyname(socket.gethostname()),
                 'user':
                     os.getlogin(),
+                'pid':
+                    os.getpid(),
                 'system':
                     platform.platform(),
                 'python':

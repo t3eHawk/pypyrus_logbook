@@ -18,15 +18,15 @@ def _you_shall_not_pass(func):
 class Email():
     """
     That class represents SMTP server and email used to send notifications
-    and alarms generated in the log.
+    and alarms generated in the logger.
     """
     def __init__ (
-        self, log, address=None, ip=None, port=None, user=None,
+        self, logger, address=None, ip=None, port=None, user=None,
         password=None, tls=True, recipients=None
     ):
         used = True if address is not None and address is not False else False
         self.used = used
-        self.log = log
+        self.logger = logger
         self.address = address
 
         self.ip = ip
@@ -108,15 +108,15 @@ class Email():
     @_you_shall_not_pass
     def alarm(self):
         """Send alarm message to the listed addresses."""
-        subject = f'ALARM in {self.log.app}!'
+        subject = f'ALARM in {self.logger.app}!'
 
-        text = self.log.header.create()
+        text = self.logger.header.create()
         text = f'<pre>{text}</pre>'
         text = MIMEText(text, 'html')
 
         attachment = None
-        if self.log.output.file.used is True:
-            attachment = self.log.output.file.path
+        if self.logger.output.file.used is True:
+            attachment = self.logger.output.file.path
 
         recipients = self.recipients
         self.send(subject, text, recipients=recipients, attachment=attachment)

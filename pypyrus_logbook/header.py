@@ -10,23 +10,24 @@ import os
 
 class Header():
     """
-    This class represents log header which used to record the most significant
+    This class represents logger header which used to record the most significant
     variables from application process. All that variables consolidated
     to internal data dictionary where key is a name of variable and its value
     is a variable meaning.
     """
-    def __init__(self, log, *args, length=80, div='*', **kwargs):
-        self.log = log
+    def __init__(self, logger, *args, length=80, div='*', **kwargs):
+        self.logger = logger
         self._used = False
         self.length = length
         self.div = div
         self.data = {
-            'app': log.app,
-            'desc': log.desc,
-            'version': log.version,
+            'app': logger.app,
+            'desc': logger.desc,
+            'version': logger.version,
             'hostname': platform.node(),
             'ip': socket.gethostbyname(socket.gethostname()),
             'user': os.getlogin(),
+            'pid': os.getpid(),
             'system': platform.platform(),
             'python':
                 f'{platform.python_version()}-{platform.architecture()[0]}',
