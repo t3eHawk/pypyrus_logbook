@@ -4,6 +4,8 @@ import pypyrus_logbook as logbook
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
+install_requires = ['sqlalchemy>=1.3.1']
+
 author = logbook.__author__
 email = logbook.__email__
 version = logbook.__version__
@@ -20,6 +22,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     license=license,
     url='https://github.com/t3eHawk/logbook',
+    install_requires=install_requires,
     packages=setuptools.find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',

@@ -1,7 +1,8 @@
-from .logger import Logger
-from .header import Header
+from .utils import py_file
+from .logger import Logger as _Logger_
 from .output import Output
 from .record import Record
+from .header import Header
 from .formatter import Formatter
 
 __author__ = 'Timur Faradzhov'
@@ -18,28 +19,37 @@ __doc__ = 'Lightweight module for work with tables in Python.'
 
 catalog = {}
 
-main = Logger(file=False, console=True, debug=True)
+def Logger(app=None, **kwargs):
+    app = app or py_file
+    logger = catalog.get(app)
+    if logger is not None:
+        logger.configure(**kwargs)
+    else:
+        logger = _Logger_(app=app, **kwargs)
+    return logger
+
+applogger = Logger(file=False, console=True, debug=True)
 
 def info(*args, **kwargs):
-    main.info(*args, **kwargs)
+    applogger.info(*args, **kwargs)
     pass
 
 def debug(*args, **kwargs):
-    main.debug(*args, **kwargs)
+    applogger.debug(*args, **kwargs)
     pass
 
 def warning(*args, **kwargs):
-    main.warning(*args, **kwargs)
+    applogger.warning(*args, **kwargs)
     pass
 
 def error(*args, **kwargs):
-    main.error(*args, **kwargs)
+    applogger.error(*args, **kwargs)
     pass
 
 def critical(*args, **kwargs):
-    main.critical(*args, **kwargs)
+    applogger.critical(*args, **kwargs)
     pass
 
 def configure(*args, **kwargs):
-    main.configure(*args, **kwargs)
+    applogger.configure(*args, **kwargs)
     pass

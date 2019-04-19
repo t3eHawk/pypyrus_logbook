@@ -4,7 +4,7 @@ import logging
 from timeit import timeit
 
 app = 'test'
-log = logbook.Log(app, filename='logbook')
+log = logbook.Logger(app, filename='logbook')
 
 smth = 'Something'
 n = 100

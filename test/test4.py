@@ -2,10 +2,10 @@
 
 import pypyrus_logbook as logbook
 
-log = logbook.Log('test', console = True)
-log.header()
+log = logbook.Logger('test', file=False)
+log.head()
 
-log.header(test = 'Hello World!')
+log.head(test='Hello World!')
 
-log.configure(headers = ['app', 'desc', 'timestamp'])
-log.header('test2', test3 = 'Hello World!')
+log.configure(headers=['app', 'desc', 'timestamp'])
+log.head('test2', test3='Hello World!')

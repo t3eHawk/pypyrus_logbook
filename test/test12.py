@@ -2,7 +2,7 @@
 
 import pypyrus_logbook as logbook
 
-log = logbook.Log('test', control=True)
+log = logbook.Logger('test', control=True)
 
 log.head()
 

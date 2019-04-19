@@ -2,7 +2,7 @@
 
 import pypyrus_logbook as logbook
 
-log = logbook.Log('test', console = True)
+log = logbook.Logger('test', console = True)
 
 log.error()
 

@@ -1,13 +1,9 @@
 import os
 import sys
-
-from datetime import datetime
-
-from .formatter import Formatter
+import datetime as dt
 
 class Record():
-    """
-    This class describes the record. Record is an instance that is going
+    """This class describes the record. Record is an instance that is going
     to be logged as separated line or set of lines in the logger.
     """
     def __init__(
@@ -20,22 +16,19 @@ class Record():
         flname = f_code.co_filename
         objname = f_code.co_name
 
-        self.tmstmp = datetime.now()
-        self.isotime = self.tmstmp.isoformat(sep=' ', timespec='seconds')
+        self.__format = format or logger.formatter.record
+
+        self.datetime = dt.datetime.now()
+        self.isotime = self.datetime.isoformat(sep=' ', timespec='seconds')
 
         self.flname = os.path.splitext(os.path.basename(flname))[0]
         self.objname = objname if objname != '<module>' else 'main'
-        self.rectype = logger.RECTYPES[rectype]
+        self.rectype = logger.rectypes[rectype]
 
-        format = format or logger.CONFIG['format']
-        self.__rec_formatter = Formatter(format)
+        self.div = logger.formatter.div
 
-        self.message = message
-        if error is True:
-            msg_fmt = message or logger.CONFIG['error_format']
-        elif error is False:
-            msg_fmt = message
-        self.__msg_formatter = Formatter(msg_fmt, logger = logger, **kwargs)
+        message = str(message if error is False else logger.formatter.error)
+        self.message = message.format(**self.__dict__, **kwargs)
         pass
 
     def __str__(self):
@@ -43,9 +36,8 @@ class Record():
 
     __repr__ = __str__
 
-    def create(self):
-        self.message = self.__msg_formatter.format()
-        string = self.__rec_formatter.format(**self.__dict__)
+    def create(self, css=False):
+        string = self.__format.format(**self.__dict__)
         return string
 
     def __catch_frame(self):

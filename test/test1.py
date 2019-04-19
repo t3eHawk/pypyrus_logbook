@@ -2,4 +2,4 @@
 
 import pypyrus_logbook as logbook
 
-log = logbook.Log('test')
+log = logbook.Logger('test')

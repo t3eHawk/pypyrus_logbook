@@ -1,13 +1,5 @@
 from .formatter import Formatter
 
-from datetime import datetime
-
-import platform
-import socket
-import pip
-import sys
-import os
-
 class Header():
     """
     This class represents logger header which used to record the most significant
@@ -18,33 +10,28 @@ class Header():
     def __init__(self, logger, *args, length=80, div='*', **kwargs):
         self.logger = logger
         self._used = False
-        self.length = length
-        self.div = div
+        self.length = logger.formatter.length
+        self.div = logger.formatter.div
         self.data = {
-            'app': logger.app,
-            'desc': logger.desc,
-            'version': logger.version,
-            'hostname': platform.node(),
-            'ip': socket.gethostbyname(socket.gethostname()),
-            'user': os.getlogin(),
-            'pid': os.getpid(),
-            'system': platform.platform(),
-            'python':
-                f'{platform.python_version()}-{platform.architecture()[0]}',
-            'exec': sys.executable,
-            'compiler': platform.python_compiler(),
-            'pip': pip.__version__,
-            'loctime': datetime.now().isoformat(sep=' ', timespec='seconds')
+            'app': logger.sysinfo.stat['app'],
+            'desc': logger.sysinfo.stat['desc'],
+            'version': logger.sysinfo.stat['version'],
+            'hostname': logger.sysinfo.stat['hostname'],
+            'ip': logger.sysinfo.stat['ip'],
+            'user': logger.sysinfo.stat['user'],
+            'pid': logger.sysinfo.stat['pid'],
+            'system': logger.sysinfo.stat['system'],
+            'python': logger.sysinfo.stat['python'],
+            'pyexe': logger.sysinfo.stat['pyexe'],
+            'script': logger.sysinfo.stat['script'],
+            'compiler': logger.sysinfo.stat['compiler'],
+            'pip': logger.sysinfo.stat['pip'],
+            'loctime': logger.sysinfo.stat['loctime']
         }
         if args or kwargs:
             self.add(**kwargs)
             self.delete(*args)
         pass
-
-    @property
-    def used(self):
-        """Flag to define whether header was used or not."""
-        return self._used
 
     def create(self):
         """Main method to build formatted header in the form of string."""
@@ -54,25 +41,24 @@ class Header():
         data = self.data
         lines = []
 
-        frame_fmt = '{div}{cntn:{flr}<{ln_in}}{div}\n'
-        frame_formatter = Formatter(frame_fmt, div=div, ln_in=ln_in)
+        frame_format = '{div}{content:{filler}<{ln_in}}{div}\n'
+        all = dict(div=div, ln_in=ln_in)
 
-        top = frame_formatter.format(cntn='', flr=div)
-        top += frame_formatter.format(cntn='', flr='')
+        top = frame_format.format(content='', filler=div, **all)
+        top += frame_format.format(content='', filler='', **all)
         lines.append(top)
 
-        cntn_fmt = '{name:>{ln_name}}: {value}'
-        cntn_formatter = Formatter(cntn_fmt)
+        content_format = '{name:>{ln_name}}: {value}'
         for d_name, d_value in data.items():
             name = d_name.upper()
             value = d_value
-            cntn = cntn_formatter.format(
+            content = content_format.format(
                 name=name, ln_name=ln_name, value=value)
-            frame = frame_formatter.format(cntn=cntn, flr='')
+            frame = frame_format.format(content=content, filler='', **all)
             lines.append(frame)
 
-        bottom = frame_formatter.format(cntn='', flr='')
-        bottom += frame_formatter.format(cntn='', flr=div)
+        bottom = frame_format.format(content='', filler='', **all)
+        bottom += frame_format.format(content='', filler=div, **all)
         lines.append(bottom)
 
         return ''.join(lines)
@@ -98,11 +84,10 @@ class Header():
         pass
 
     def refresh(self):
-        """Refresh dynamic values in data dictionary."""
+        """Update dynamic data variables."""
         if hasattr(self, 'data') is True:
             if self.data.get('loctime') is not None:
-                self.data['loctime'] = datetime.now().isoformat(
-                    sep=' ', timespec='seconds')
+                self.data['loctime'] = self.logger.sysinfo.stat['loctime']
         pass
 
     def _calc_len(self):
@@ -112,3 +97,8 @@ class Header():
         ln_name = max([len(key) for key in self.data.keys()]) + 3
         ln_value = ln_in - ln_name
         return (ln_out, ln_in, ln_name, ln_value)
+
+    @property
+    def used(self):
+        """Flag to define whether header was used or not."""
+        return self._used

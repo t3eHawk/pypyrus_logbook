@@ -3,7 +3,7 @@
 import pypyrus_logbook as logbook
 import time
 
-log = logbook.Log('test')
+log = logbook.Logger('test')
 log.header(test = 'Hello World!')
 log.info('Before reopen.')
 time.sleep(1)

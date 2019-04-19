@@ -2,7 +2,7 @@
 
 import pypyrus_logbook as logbook
 
-log = logbook.Log('test', console = True)
+log = logbook.Logger('test', file=False)
 
 def divide(i, const = 1):
   try:

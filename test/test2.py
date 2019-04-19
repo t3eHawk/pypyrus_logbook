@@ -2,7 +2,7 @@
 
 import pypyrus_logbook as logbook
 
-log = logbook.Log('test', console=True)
+log = logbook.Logger('test', file=False)
 
 info = 'Very interesting information'
 log.info(info)

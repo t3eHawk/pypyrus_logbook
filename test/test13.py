@@ -3,12 +3,12 @@ import pypyrus_logbook as logbook
 from timeit import timeit
 
 app = 'test'
-log = logbook.Log(app)
+log = logbook.Logger(app)
 smth = 'Something'
 n = 100
 
 def test_init():
-    log = logbook.Log(app)
+    log = logbook.Logger(app)
     pass
 
 def test_config():
