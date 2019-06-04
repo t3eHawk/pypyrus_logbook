@@ -3,7 +3,7 @@
 import pypyrus_logbook as logbook
 import time
 
-log = logbook.Logger('test', maxsize=1024*1.5)
+log = logbook.getlogger(file=True, maxsize=1024*1.5)
 
 log.head()
 for i in range(25):

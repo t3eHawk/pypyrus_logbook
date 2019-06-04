@@ -1,6 +1,7 @@
 import pypyrus_logbook as logbook
 
-log = logbook.Logger('test', console=True)
+
+log = logbook.getlogger()
 
 smth = 'Something'
 log.info(smth)

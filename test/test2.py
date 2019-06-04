@@ -1,8 +1,7 @@
-# Declaration for console output.
-
 import pypyrus_logbook as logbook
 
-log = logbook.Logger('test', file=False)
+
+log = logbook.getlogger()
 
 info = 'Very interesting information'
 log.info(info)

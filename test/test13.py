@@ -1,18 +1,16 @@
 import pypyrus_logbook as logbook
 
-from timeit import timeit
 
-app = 'test'
-log = logbook.Logger(app)
+log = logbook.getlogger(file=True)
 smth = 'Something'
 n = 100
 
 def test_init():
-    log = logbook.Logger(app)
+    log = logbook.getlogger()
     pass
 
 def test_config():
-    log.configure(filename='{app}_{tmstmp:%Y%m%d}')
+    log.configure(filename='{root.logger.name}.{root.logger.start_date:%Y%m%d}')
     pass
 
 def test_head():
@@ -41,13 +39,13 @@ def test_ooops():
         log.error('Ooops')
     pass
 
-rec_init = timeit(test_init, number=n)/n
-res_config = timeit(test_config, number=n)/n
-res_head = timeit(test_head, number=n)/n
-res_info = timeit(test_info, number=n)/n
-res_error = timeit(test_error, number=n)/n
-res_empty_error = timeit(test_empty_error, number=n)/n
-res_ooops = timeit(test_ooops, number=n)/n
+rec_init = timeit.timeit(test_init, number=n)/n
+res_config = timeit.timeit(test_config, number=n)/n
+res_head = timeit.timeit(test_head, number=n)/n
+res_info = timeit.timeit(test_info, number=n)/n
+res_error = timeit.timeit(test_error, number=n)/n
+res_empty_error = timeit.timeit(test_empty_error, number=n)/n
+res_ooops = timeit.timeit(test_ooops, number=n)/n
 
 print('Result of init:', res_config)
 print('Result of config:', res_config)

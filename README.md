@@ -34,7 +34,7 @@ To install just download the latest release of *[logbook](https://github.com/tm7
 ## How to Use
 To start just declare log class instance:
 ```
-import logbook
+import pypyrus_logbook as logbook
 
-log = logbook.Log('test')
+log = logbook.getlogger()
 ```

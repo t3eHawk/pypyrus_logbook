@@ -1,8 +1,23 @@
 
+
 class Formatter():
-    """Class represents object's formats."""
+    """This class represents formatter - object that defines the format of the
+    output records.
+
+    Parameters
+    ----------
+    record : str, optional
+        Format of the output record.
+    error : str, optional
+        Format of the error message.
+    length : int, optional
+        Basic length of line in output.
+    div : str, optional
+        Text symbol used for borders and blocks.
+    """
+
     def __init__(self, record=None, error=None, length=80, div='*'):
-        def_record = '{isotime}\t{rectype}\t{message}\n'
+        def_record = '{isodate}\t{rectype}\t{message}\n'
         def_error = '{err_name}\t{err_value}\t{err_file}\t{err_line}\t{err_obj}'
 
         record = record or def_record
@@ -12,42 +27,21 @@ class Formatter():
         pass
 
     def configure(self, record=None, error=None, length=None, div=None):
+        """Configure Formatter instance parameters.
+
+        Parameters
+        ----------
+        record : str, optional
+            Format of the output record.
+        error : str, optional
+            Format of the error message.
+        length : int, optional
+            Basic length of line in output.
+        div : str, optional
+            Text symbol used for borders and blocks.
+        """
         if record is not None: self.record = record
         if error is not None: self.error = error
         if length is not None: self.length = length
         if div is not None: self.div = div
         pass
-
-    # def _set_pattern(self, pattern=None):
-    #     """Initialize the pattern."""
-    #     if pattern is not None:
-    #         self.pattern = str(pattern)
-    #         # Test pattern on unknown forms.
-    #         used_forms = re.findall(r'{.*?[}|:]', self.pattern)
-    #         for form in used_forms:
-    #             name_form = form[1:-1]
-    #             str_w_form = f'{{{name_form}}}'
-    #             try:
-    #                 str_w_form.format(**self.forms)
-    #             except KeyError:
-    #                 self._set_forms(name_form)
-    #     elif hasattr(self, 'pattern') is False:
-    #         self.pattern = ''
-    #     pass
-    #
-    # def _set_forms(self, *args, **kwargs):
-    #     """
-    #     Initialize the forms.
-    #     If the variable is ordered then add it with "None" value.
-    #     Used mostly for the cases when the pattern include unknown forms to
-    #     prevent errors.
-    #     """
-    #     if args:
-    #         for arg in args:
-    #             self.forms[arg] = 'NONE'
-    #     if kwargs:
-    #         for key, value in kwargs.items():
-    #             if value is None:
-    #                 value = 'NONE'
-    #             self.forms[key] = value
-    #     pass

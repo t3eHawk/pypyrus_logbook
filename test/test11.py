@@ -1,9 +1,10 @@
-# Direct output.
-
 import pypyrus_logbook as logbook
 
-log1 = logbook.Logger('test', console = True)
-log1.output('Hello world\n')
+log = logbook.getlogger()
+log.write('Doing...')
+log.write('done')
+log.blank()
 
-log2 = logbook.Logger('test')
-log2.output('Hello world\n')
+log.line('In progress...')
+log.line('Still in progress...')
+log.write('Finished')

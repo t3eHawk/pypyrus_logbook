@@ -1,8 +1,7 @@
-# General look of one page log.
-
 import pypyrus_logbook as logbook
 
-log = logbook.Logger('test', control=True)
+
+log = logbook.getlogger(control=False)
 
 log.head()
 

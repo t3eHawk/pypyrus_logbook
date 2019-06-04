@@ -1,11 +1,11 @@
-# Using headers.
-
 import pypyrus_logbook as logbook
 
-log = logbook.Logger('test', file=False)
+
+log = logbook.getlogger()
 log.head()
 
-log.head(test='Hello World!')
+log.header.include(test='Hello World!')
+log.head()
 
-log.configure(headers=['app', 'desc', 'timestamp'])
-log.head('test2', test3='Hello World!')
+log.header.exclude('user')
+log.head()
