@@ -290,7 +290,9 @@ class File(Branch):
         # Define new path.
         head = self.dir
         tail = f'{self.name}.{self.ext}'
-        self._path = os.path.join(head, tail).format(root=self.root)
+        datetime = self.root.logger.start_date
+        path = os.path.join(head, tail)
+        self._path = path.format(root=self.root, datetime=datetime)
 
         # Handler and file statistics must be purged.
         self.__handler = None
@@ -420,7 +422,12 @@ class Email(Branch):
 
         if host is not None or port is not None \
         or user is not None or password is not None:
-            self.connect(password)
+            try:
+                self.connect(password)
+            except:
+                self.root.logger.warning('Cannot connect to SMTP server')
+                self.root.logger.warning()
+                self._status = False
         pass
 
     @you_shall_not_pass
@@ -721,18 +728,26 @@ class Table(Branch):
         # Here is a creating of database connection.
         if isinstance(db, sql.engine.base.Connection) is True:
             self.db = db
-        elif isinstance(db, sql.engine.base.Engine) is True:
-            self.db = db.connect()
-        elif host is not None or port is not None or sid is not None \
-        or user is not None or password is not None:
-            self.connect(password)
-
+        else:
+            try:
+                if isinstance(db, sql.engine.base.Engine) is True:
+                    self.db = db.connect()
+                elif (host is not None or port is not None or
+                      sid is not None or user is not None or
+                      password is not None):
+                    self.connect(password)
+            except:
+                self.root.logger.warning('Cannot connect to database')
+                self.root.logger.warning()
+                self._status = False
         # Here is a table declaration.
-        if isinstance(proxy, sql.sql.schema.Table) is True:
-            self.proxy = proxy
-            self._primary_key = None
+        if (isinstance(proxy, sql.sql.schema.Table) is True or
+            table is not None):
+            if isinstance(proxy, sql.sql.schema.Table) is True:
+                self.proxy = proxy
+            elif table is not None:
+                self.load()
             self._primary_key_column = self._get_primary_key_column()
-        elif table is not None:
             self.new()
         pass
 
@@ -792,19 +807,20 @@ class Table(Branch):
         pass
 
     @you_shall_not_pass
-    def new(self):
-        """Declare the logging table."""
+    def load(self):
+        """Load table."""
         # Describe table.
         self._metadata = sql.MetaData()
-        self.proxy = sql.Table(
-            self.table, self._metadata,
-            autoload=True, autoload_with=self.db,
-            schema=self.schema)
+        self.proxy = sql.Table(self.table, self._metadata,
+                               autoload=True, autoload_with=self.db,
+                               schema=self.schema)
+        pass
+
+    @you_shall_not_pass
+    def new(self):
         # New table means that record is not created yet so there cannot be
         # any primary key by now.
         self._primary_key = None
-        # Get priamry key column name of new table.
-        self._primary_key_column = self._get_primary_key_column()
         pass
 
     @you_shall_not_pass

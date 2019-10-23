@@ -1,3 +1,4 @@
+import atexit
 import datetime as dt
 import os
 import platform
@@ -206,6 +207,9 @@ class Logger():
         self.email = self.root.email
         self.html = self.root.html
         self.table = self.root.table
+
+        # Set exit function.
+        atexit.register(self._exit)
 
         # Add creating logger to special all_loggers dictinary.
         all_loggers[self._name] = self
@@ -435,7 +439,7 @@ class Logger():
         self.record(rectype, message, **kwargs)
         pass
 
-    def error(self, message=None, rectype='error', format=None, alarming=None,
+    def error(self, message=None, rectype='error', format=None, alarming=False,
               level=1, **kwargs):
         """Send ERROR record to the output.
         If exception in current traceback exists then method will format the
@@ -467,11 +471,9 @@ class Logger():
         self._count_errors += 1
 
         format = self.formatter.error if format is None else format
-        alarming = self._alarming if alarming is None else alarming
-
         # Parse the error.
         err_type, err_value, err_tb = sys.exc_info()
-        if err_type is not None:
+        if message is None and err_type is not None:
             if isinstance(format, str) is True:
                 err_name = err_type.__name__
                 err_value = err_value
@@ -497,17 +499,18 @@ class Logger():
             message = message or ''
             self.record(rectype, message, **kwargs)
 
-        # Inform about the error.
-        if alarming is True:
-            self.root.email.alarm()
-
         # Break execution in case of critical error if permitted.
+        # The alarm will be generated at exit if it is configured.
         if self._control is True:
             if level >= self._maxlevel:
                 sys.exit()
             if self._maxerrors is not False:
                 if self._count_errors > self._maxerrors:
                     sys.exit()
+
+        # Send alarm if execution was not aborted but alarm is needed.
+        if alarming is True:
+            self.root.email.alarm()
         pass
 
     def warning(self, message=None, **kwargs):
@@ -621,6 +624,12 @@ class Logger():
         configured.
         """
         self.root.table.write(**kwargs)
+        pass
+
+    def _exit(self):
+        # Inform about the error.
+        if self._alarming is True and self._with_error is True:
+            self.root.email.alarm()
         pass
 
     def __calculate_restart_date(self):

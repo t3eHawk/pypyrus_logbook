@@ -1,6 +1,7 @@
 import datetime as dt
 import os
 import sys
+import threading
 
 
 class Record():
@@ -73,13 +74,17 @@ class Record():
         objname = f_code.co_name
         self.objname = objname if objname != '<module>' else 'main'
         self.flname = os.path.splitext(os.path.basename(flname))[0]
+        self.thread = threading.current_thread().name
 
         # Styling forms.
         self.div = logger.formatter.div
 
         # Store formatted message as instance attribute.
         message = str(message if error is False else logger.formatter.error)
-        self.message = message.format(**self.__dict__, **kwargs)
+        try:
+            self.message = message.format(**self.__dict__, **kwargs)
+        except KeyError:
+            self.message = message
         pass
 
     def __str__(self):

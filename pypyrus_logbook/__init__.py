@@ -11,14 +11,14 @@ __copyright__ = 'Copyright 2019, The Pypyrus Logbook Project'
 __credits__ = ['Timur Faradzhov']
 
 __license__ = 'MIT'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 __maintainer__ = 'Timur Faradzhov'
 __email__ = 'timurfaradzhov@gmail.com'
 __status__ = 'Production'
 
 __doc__ = 'Module for extended logging in Python.'
 
-def getlogger(name=None, **kwargs):
+def logger(name=None, **kwargs):
     """Get new logger or return existing one.
     If parameter name is omitted then return main application logger.
     All other named parameters will be used for configuration.
@@ -36,12 +36,14 @@ def getlogger(name=None, **kwargs):
         The `Logger` object.
     """
     name = name or py_file
-    logger = all_loggers.get(name)
-    if logger is not None:
-        if len(kwargs) > 0: logger.configure(**kwargs)
+    if all_loggers.get(name) is not None:
+        if len(kwargs) > 0:
+            all_loggers[name].configure(**kwargs)
+        return all_loggers[name]
     else:
-        logger = Logger(name=name, **kwargs)
-    return logger
+        return Logger(name=name, **kwargs)
+
+getlogger = logger
 
 applogger = getlogger(file=False, console=True, debug=True)
 
