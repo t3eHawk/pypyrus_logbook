@@ -1,19 +1,19 @@
 import setuptools
-import pypyrus_logbook as logbook
+import pepperoni
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 install_requires = ['sqlalchemy>=1.3.1']
 
-author = logbook.__author__
-email = logbook.__email__
-version = logbook.__version__
-description = logbook.__doc__
-license = logbook.__license__
+author = pepperoni.__author__
+email = pepperoni.__email__
+version = pepperoni.__version__
+description = pepperoni.__doc__
+license = pepperoni.__license__
 
 setuptools.setup(
-    name='pypyrus-logbook',
+    name='pepperoni',
     version=version,
     author=author,
     author_email=email,
@@ -21,7 +21,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     license=license,
-    url='https://github.com/t3eHawk/logbook',
+    url='https://github.com/t3eHawk/pepperoni',
     install_requires=install_requires,
     packages=setuptools.find_packages(),
     classifiers=[

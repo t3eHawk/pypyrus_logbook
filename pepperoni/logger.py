@@ -2,7 +2,7 @@ import atexit
 import datetime as dt
 import os
 import platform
-import pypyrus_logbook as logbook
+import pepperoni
 import sys
 import time
 import traceback
@@ -25,7 +25,7 @@ class Logger():
 
     Each logger must have an unique name which will help to identify it.
     Main application logger will have the same name as a python script file.
-    It can be accessed by native logbook methods or by calling `getlogger()`
+    It can be accessed by native pepperoni methods or by calling `getlogger()`
     method with no name.
 
     Parameters
@@ -141,29 +141,29 @@ class Logger():
     filters : dict
         Record types filters. To filter record type just set corresponding
         item value to False.
-    root : pypyrus_logbook.output.Root
+    root : pepperoni.output.Root
         The output `Root` object.
-    console : pypyrus_logbook.output.Console
+    console : pepperoni.output.Console
         The output `Console` object. Shortcut for `Logger.root.console`.
-    file : pypyrus_logbook.output.File
+    file : pepperoni.output.File
         The output file. Shortcut for `Logger.output.file`.
-    email : pypyrus_logbook.output.Email
+    email : pepperoni.output.Email
         The output email. Shortcut for `Logger.output.email`.
-    html: pypyrus_logbook.output.HTML
+    html: pepperoni.output.HTML
         The output HTML document. Shortcut for `Logger.output.html`.
-    table: pypyrus_logbook.output.Table
+    table: pepperoni.output.Table
         The output table. Shortcut for `Logger.output.table`.
-    formatter : pypyrus_logbook.formatter.Formatter
+    formatter : pepperoni.formatter.Formatter
         Logger formatter which sets all formatting configuration like
         record template, error message template, line length etc.
-    sysinfo : pypyrus_logbook.sysinfo.Sysinfo
+    sysinfo : pepperoni.sysinfo.Sysinfo
         Special input object which parse different inputs includeing system
         specifications, flag arguments, execution parameters, user parameters
         and environment variables and transforms all of that to `Dataset`
         object. Through the `Dataset` object data can be easily accessed by
         get item operation or by point like `sysinfo.desc['hostname']` or
         `sysinfo.desc.hostname`.
-    header : pypyrus_logbook.header.Header
+    header : pepperoni.header.Header
         The header that can be printed to the writable output.
     """
 

@@ -7,7 +7,7 @@ from .record import Record
 from .utils import py_file
 
 __author__ = 'Timur Faradzhov'
-__copyright__ = 'Copyright 2019, The Pypyrus Logbook Project'
+__copyright__ = 'Copyright 2019, The Pepperoni Project'
 __credits__ = ['Timur Faradzhov']
 
 __license__ = 'MIT'
